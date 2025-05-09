@@ -1,0 +1,20 @@
+1.A Value: 0x09  Mode: Memory
+1.B Value: 0x222  Mode: Memory
+1.C Value: 0x230  Mode: Immediate
+1.D Value: 0x218  Mode: Memory
+1.E Value: 0x228  Mode: Memory
+1.F Value: 0xFA  Mode: Immediate
+1.G Value: 0x230  Mode: Memory
+
+2.A Destination: %rsi  Value: 0x9
+2.B Destination: %rbx  Value: 0x0
+2.C Destination: 0x210  Value: 0xAA
+2.D Destination: %rdi  Value: 0xBE
+2.E Destination: %rdx  Value: 0xFFFFFFFF
+2.F Destination: 0x220  Value: 0x900
+2.G Destination: %rax  Value: 0x110
+2.H Destination: 0x218  Value: 0xBC
+2.I Destination: %rax  Value: 0x219
+2.J Destination: 0x230  Value 0x2B
+
+omg it works

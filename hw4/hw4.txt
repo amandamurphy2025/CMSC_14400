@@ -1,0 +1,17 @@
+1. The divide by zero error is found typically at the start of the exception table, address 0x0 relative to the exception table.  This means the base address for the table corresponds to the divide by zero error, at 0xC0015200.  The relevant entry would be:
+
+	Excpetion # |  Description  |  Actual Function
+	----------------------------------------------
+	0	    |  Divide Error |  DivideByZeroError()
+
+
+2. Sequence of CPU Events:
+
+	1. faulting instruction at 0x08032000 which is also %eip.
+		-CPU finds instruction at %eip and finds "idivl %ebx"
+	2. CPU knows this instruction will throw DivideByZero Exception
+	3. Interrupt Vector will index into exception table. The address for the DivideByZero Error is given at 0xC0015200 and we know it is at 0x0 in the exception table, so the vector would point here.
+	4. Use the vector (k) number 0 to find the entry.  The entry for vector 0 is the first item in the exception table.  The CPU goes into the table to find this entry.
+	5. The table contains the DivideByZero exception handler's address, which is given at 0xC0015200.  
+	6. %eip is changed to point to the DivideByZero exception handler, so 0xC0015200.
+	7. execute DivideByZero Handler code.

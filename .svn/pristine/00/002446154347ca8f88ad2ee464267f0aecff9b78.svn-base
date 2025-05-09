@@ -1,0 +1,43 @@
+A-------------
+
+1. P 16 0
+2. P 23 102
+3. C 19 0
+4. P 8 102
+5. C 8 0
+6. C 10 0
+7. P 26 102
+
+B------------
+
+1. P 16 0
+2. P 23 102
+3. C 19 0
+4. C 8 0
+5. C 10 0
+6. P 26 102
+
+The race condition is that both the parent and the child send and recieve SIGUSR1 at different times.  The timing of child and parent's processes can be different, so the output depends on which occurs first: the child process exiting, or the parent sending SIGUSR1.  Essentially, if the child runs handler1 and exits before the p
+arent sends SIGUSR1, we get the output from part B.  If the parents sends SIGUSR1 before the child exits, we g
+et part A.
+
+C----------
+
+1. P 16 0
+2. P 23 102
+3. C 8 0
+4. C 10 0
+5. P 26 102
+
+The child process ran handler1 from the SIGUSR1 signal from the parent.  Once child says "see ya" that means i
+t is going to exit.  Once it exits, the parent says "child done", and everything is done.  This is just the no
+rmal way the function should run, where the child recieves the signal and exits.
+
+D---------
+
+1. P 16 0
+2. C 19 0
+3. P 8 0
+4. P 10 0
+
+The parent process begins and the child process then runs before the 'else' statement - "hello im 102".  Child sends the SIGUSR1 signal and the parent runs handler1.  The race condition is the parent gets the SIGUSR1 signal from the child before it makes its signal, so the parent SIGUSR1 call will just exit.

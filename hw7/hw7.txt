@@ -1,0 +1,20 @@
+1A. The OS saves the Segment Table with pointers to each segment's page table.  It also saves general and floating-point and status registers, the user stack, the kernel stack, the program counter, and a process table.
+
+1B. I would choose 2-Level paging.  The full page table is not in memory at all times, only important parts of it when necessary, so therefore it would be able to manage more addresses than simple paging.
+
+1C. Since the offset is a mod of the page size, the offset will never go over the page size.  The offset finds locations inside the page, so it will never be larger than this.
+
+1D. Atomic primitives are necesary for running concurrent threads/processes correctly.  They cannot be interrupted.  They make sure the shared memory is correct during synchronization.  They do this by helping avoid race conditions, implementing locks, and protecting from interruptions.  Hardware can provide better than Load and Store methods.
+
+
+---alternate version of Q2------
+2A.  Using the register version, the pros are:
+	1. speed - it is quicker to access a register than it is to access memory.
+	2. there is also less processing time and memory used.
+The cons are:
+	1. using a register does not ensure atomicity, whereas the memory one is dependent on atomics.
+	2. If many processors/synchronization, registers make it harder since changes to the registers are not visible to other processors.
+
+2B. TestandSet reads a value from memory into the registers and changes the value in memory.  XCHG atomically exchanges two mem locations, which can greatly simplify implementing locks.  XCHG does not need to separate read, write, and change like TestandSet does, so there is a lot less likely error from race conditions.
+
+2C. Locks don't necessarily need the full contents to be changed.  TestandSet does a simple set operation with small amount of info like a bit or a flag which is all that is needed to cue to the lock status.  This makes XCHG inefficient for certain locks.

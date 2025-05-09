@@ -1,0 +1,31 @@
+akmurphak hw2 grade: 20/22
+
+Graded files from svn revision 8
+
+--------------------------------------
+Question 1 points and comments: 12/12
+
+1A - correct
+1B - correct
+1C - correct
+1D - correct
+1E - correct
+1F - correct (The OR operation should be *bitwise* OR, "|", not logical OR "||".
+    You correctly mention this in part E, so I assume this is just a typo in the
+    code.)
+
+Graded by:  Alec  Bargher (abargher)
+--------------------------------------
+
+Question 2 points and comments: 8/10
+long funcP(long r, long s, long t) { if (s > 0) {
+return funcQ(t, s) + r; } else {
+return t + funcQ(s, r); }
+}
+
+
+Graded by:  Hanchen  Li (lihanc2002)
+--------------------------------------
+
+If you believe there is an error in how you were graded, you have a week,
+starting from when this grade was returned, to notify us via email.

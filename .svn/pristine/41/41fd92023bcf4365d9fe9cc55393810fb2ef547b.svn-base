@@ -1,0 +1,60 @@
+PROBLEM 1
+
+A. Which registers hold program values x, n, result, and mask?
+	x: rdi
+	n: rsi
+	result: rax
+	mask: rdx
+B. What are the initial values of result and mask?
+	result: 0
+	mask: 4
+C. test condition for mask?
+	test if %rdx is equal to 0
+D. How mask updated
+	updated by multiplication by 2^n, bit-shifting 4 to the left n times per loop until it reaches 0, then the for loop ends
+
+E. How result updated?
+	result is updated by becoming equal to mask, then a bitwise AND operation between that and x.  Then a bitwise OR between this updated result and the value of result from the previous loop/before these updates.
+
+F. 
+
+long loop(long x, long n) {
+	long result = 0;
+	long mask;
+	for (mask = 4; mask != 0; mask = mask << n) {
+		result = result || (mask & x);
+	}
+	return result;
+}
+
+----------------------------
+
+PROBLEM 2
+
+long funcQ(long x, long y){
+	long result;
+	result = 3 * y;
+	result = result + x;
+	return result;
+}
+
+long funcP(long r, long s, long t){
+	long result;
+	if (s <= 0) {
+		long temp;
+		temp = r;
+		r = s;
+		s = temp;
+		result = funcQ(s, r);
+		result = result + t;
+	}
+	else {
+		long temp2;
+		temp2 = t;
+		t = r;
+		r = temp2;
+		result = funcQ(t, s)
+		result = result + r;
+	}
+	return result;
+}

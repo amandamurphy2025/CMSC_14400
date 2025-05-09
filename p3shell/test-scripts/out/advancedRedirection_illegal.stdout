@@ -1,0 +1,82 @@
+ls /stage/classes/archive/2014/spring/15400/p4shell/mpich-3.1 >+ advancedRedirection_illegal_rd_1 
+ls /stage/classes/archive/2014/spring/15400/p4shell/mpich-3.1 >+ advancedRedirection_illegal_rd_1
+ls /stage/classes/archive/2014/spring/15400/p4shell/mpich-3.1>+./afolderdoesnotexist/advancedRedirection_illegal_rd_2
+ls /stage/classes/archive/2014/spring/15400/p4shell/mpich-3.1>+./afolderdoesnotexist/advancedRedirection_illegal_rd_2
+aclocal.m4
+autogen.sh
+CHANGES
+confdb
+configure
+configure.ac
+contrib
+COPYRIGHT
+doc
+examples
+maint
+Makefile.am
+Makefile.in
+man
+mpich.def
+mpich-doxygen.in
+mpi.def
+README
+README.envvar
+RELEASE_NOTES
+src
+subsys_include.m4
+test
+www
+aclocal.m4
+autogen.sh
+CHANGES
+confdb
+configure
+configure.ac
+contrib
+COPYRIGHT
+doc
+examples
+maint
+Makefile.am
+Makefile.in
+man
+mpich.def
+mpich-doxygen.in
+mpi.def
+README
+README.envvar
+RELEASE_NOTES
+src
+subsys_include.m4
+test
+www
+>+
+An error has occurred
+>+ 
+An error has occurred
+	>+
+An error has occurred
+ >+ 
+An error has occurred
+ls /stage/classes/archive/2014/spring/15400/p4shell/mpich-3.1 >+ >+ advancedRedirection_illegal_rd_3
+An error has occurred
+ls /stage/classes/archive/2014/spring/15400/p4shell/mpich-3.1 >+ advancedRedirection_illegal_rd_4 >+
+An error has occurred
+ls /stage/classes/archive/2014/spring/15400/p4shell/mpich-3.1 advancedRedirection_illegal_rd_5 >+
+An error has occurred
+exit
+>+
+An error has occurred
+>+ 
+An error has occurred
+	>+
+An error has occurred
+ >+ 
+An error has occurred
+ls /stage/classes/archive/2014/spring/15400/p4shell/mpich-3.1 >+ >+ advancedRedirection_illegal_rd_3
+An error has occurred
+ls /stage/classes/archive/2014/spring/15400/p4shell/mpich-3.1 >+ advancedRedirection_illegal_rd_4 >+
+An error has occurred
+ls /stage/classes/archive/2014/spring/15400/p4shell/mpich-3.1 advancedRedirection_illegal_rd_5 >+
+An error has occurred
+exit

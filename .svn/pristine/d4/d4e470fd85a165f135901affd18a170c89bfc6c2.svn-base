@@ -1,0 +1,37 @@
+1A. tttt tttt ssbb
+
+1B.
+
+0x831 Hit 27
+
+0x00B Hit 5B
+
+0x006 Hit 56
+
+0xFFE Hit 09
+
+0x54E Hit -
+
+0x54C Hit n/a
+
+0x007 Hit n/a
+
+0x44c Miss -
+
+0xFFD Hit F1
+
+
+2A. 
+Data from x[0] and x[1] will use same cache line because 128 * 4 = 512, which is the cache size. Therefore, miss rate is 100%.
+
+2B.
+Now, entire array fits in the cache: 128 * 4 * 2 = 1024.  Cold misses for each block define miss rate.  Each block holds 4 items: 16 bytes per block / 4 bytes per int.  1 out of every 4 is a miss, therefore miss rate is 25%.
+
+2C. 
+No more conflict misses.  Therefore, miss rate is 25% from the cold misses upon loading blocks.
+
+2D.
+No, the miss rate would stay the same.  Each cache block needs to be loaded and there are misses here no matter what.
+
+2E.
+Yes, the cold misses are calculated by how many items are in each block.  Right now it is 1 out of 4, but if it was 1 out of X, where X is bigger than 4, the miss rate would reduce to 1/X.

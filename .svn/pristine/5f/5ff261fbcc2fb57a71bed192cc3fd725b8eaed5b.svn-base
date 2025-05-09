@@ -1,0 +1,27 @@
+akmurphak hw1 grade: 20/34
+
+Graded files from svn revision 6
+
+--------------------------------------
+Question 1 points and comments: 3/14
+
+1A - partially correct - the mode is Indirect
+1B - wrong - the *memory address* is in fact 0x222 (base + displacement mode), but we cannot determine the value at this address because we don't know the *endianness*
+1C - wrong - 560 is Absolute mode, the memory address 0x230, which has value 0x54
+1D - wrong - the mode is Indexed, so the *value* at address 0x218 is 0xBC
+1E - wrong - the mode is Scaled Indexed, so the *value* at address 0x228 is 0x42
+1F - correct
+1G - wrong - the mode is Scaled Indexed, so the *value* at address 0x230 is 0x54
+
+Graded by:  Alec Bargher (abargher)
+--------------------------------------
+
+Question 2 points and comments: 17/20
+2E - incorrect value. when applying bitwise not to 0x1, all bits will be one except the last one (so our string should end in an E). Also remember that q signifies a 64-bit number
+2H - incorrect value. this should be 0xBC00
+2J - incorrect value. this should be 0x2A. be careful when converting from hex to binary and back!
+Graded by:  Chris  Marshall (chrismarshall)
+--------------------------------------
+
+If you believe there is an error in how you were graded, you have a week,
+starting from when this grade was returned, to notify us via email.

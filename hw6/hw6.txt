@@ -1,0 +1,15 @@
+1A. Yes, P1 can be loaded in address 0.  Addresses 0-2 are now allocated.
+1B. Yes, P2 can be loaded in address 3.  Addresses 3-5 are now allocated.
+1C. No, P3 cannot be loaded because there are no continguous spans of 3MB for it to be loaded into.
+1D. P1's internal fragmentation is 2MB.  P2's internal fragmentation is 1MB.  P3's internal fragmentation is 0MB because it was never able to be loaded, so no memory was allocated to it.  Total internal fragmentation is 3MB.
+1E.  External Fragmentation is the total available unallocated memory, which is 3MB.
+
+2A.
+
+r 0xE5 = 1 | 1100101 ; 36 + 65 = 9B (S)
+
+w 0x4A = 0 | 1001010 ; A8 + 4A = F2 (E)
+
+r 0x37 = 0 | 00110111 ; A8 + 37 = DF (S)
+
+2B.  The largest segment would have to be able to fit an offset of 0x65. The maximum possible offset would be 1111111 which is 2^7 bytes. 

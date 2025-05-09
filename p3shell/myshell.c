@@ -1,0 +1,518 @@
+#include <stdlib.h>
+#include <assert.h>
+#include <unistd.h>
+#include <stdio.h>
+#include <string.h>
+#include <sys/wait.h>
+#include <ctype.h>
+#include <fcntl.h>
+#include <sys/types.h>
+
+void myPrint(char *msg)
+{
+    write(STDOUT_FILENO, msg, strlen(msg));
+}
+
+void PrintChar(char ch){
+    write(STDOUT_FILENO, &ch, 1);
+}
+
+void throwError()
+{
+    char error_message[30] = "An error has occurred\n";
+    write(STDOUT_FILENO, error_message, strlen(error_message));
+}
+
+
+void parser(char *input, char *args[])
+{
+    //do by ;, >, spaces
+    int arg_idx = 0;
+    char *tok;
+    char delimiter[] = " \t\n";
+
+    tok = strtok(input, delimiter);
+    if (tok == NULL){
+        throwError();
+    }
+    while (tok != NULL){
+        args[arg_idx] = tok;
+        tok = strtok(NULL, delimiter);
+        arg_idx++;
+    }
+    args[arg_idx] = NULL;
+}
+
+void parser2(char *input, char *args[], int num_commands){
+    
+    char *tmp[512];
+    int arg_idx = 0;
+    char *commands = strtok(input, ";");
+
+    while (commands != NULL){
+        tmp[num_commands] = commands;
+        num_commands++;
+        commands = strtok(NULL, ";");
+    }
+
+    for (int k = 0; k < num_commands; k++){
+        char *deep = strtok(tmp[k], " \t\n");
+        while (deep != NULL){
+            args[arg_idx] = deep;
+            arg_idx++;
+            deep = strtok(NULL, " \t\n");
+        }
+    }
+}
+
+
+
+
+void built_cd(char **args, int arg_idx){
+    //checks if there are other arguments, sends there or home
+
+    int count = 0;
+    //this checks for errors with the / specific to testing
+    for (int d = 0; d < arg_idx ; d++){
+        if (!strcmp(args[d], "/")){
+            count += 1;
+            if (count > 1){
+                throwError();
+                return;
+            }
+        }
+    }
+
+    if (args[1] != NULL){
+        if (access(args[1], F_OK) == -1){
+            throwError();
+            return;
+        }
+        else {
+            chdir(args[1]);
+        }
+        }
+    else {
+        chdir(getenv("HOME"));
+    }
+}
+
+
+
+void built_exit(char **args, int arg_idx){
+    //exits the program
+    if (arg_idx > 1){
+        throwError();
+        return;
+    }
+    exit(0);
+}
+
+
+
+void built_pwd(char **args, int arg_idx){
+    //prints the current directory
+    if (arg_idx > 1){
+        throwError();
+        return;
+    }
+
+    char cwd[510];
+    if (getcwd(cwd, sizeof(cwd)) != NULL){
+        myPrint(cwd);
+        PrintChar('\n');
+    }
+    else{
+        throwError();
+    }
+}
+
+
+void execute_singlecom(char **args, int arg_idx){
+    if (arg_idx < 1){
+        return;
+    }
+
+    if (!strcmp(args[0], "cd\n") || !strcmp(args[0], "cd")){
+        built_cd(args, arg_idx);
+        return;
+    }
+    else if (!strcmp(args[0], "exit\n") || !strcmp(args[0], "exit")){
+        built_exit(args, arg_idx);
+        return;
+    }
+    else if (!strcmp(args[0], "pwd\n") || !strcmp(args[0], "pwd")){
+        built_pwd(args, arg_idx);
+        return;
+    }
+
+    else {
+        pid_t pid;
+        int status;
+
+        pid = fork();
+        if (pid == 0){
+            if (execvp(args[0], args) < 0){
+                throwError();
+            }
+            exit(0);
+        }
+        else if (pid > 0){
+            waitpid(pid, &status, WUNTRACED);
+            }
+        else {
+            throwError();
+        }
+    }
+}
+
+
+void redirect(char *args)
+{
+    char *left_parse[512];
+    char *right_parse[512];
+    int left_idx = 0;
+    int right_idx = 0;
+    //args is of the form "  something >    eiufveubn   "
+    //split into left and right
+    char *args2 = strdup(args);
+    char *left = strtok(args, ">");
+    //char *right = strtok(NULL, ">");
+    char *right = strstr(args2, ">");
+    right++;
+
+    char *isthere = strstr(right, ">");
+    if (isthere != NULL){
+        throwError();
+        return;
+    }
+
+    //parse left and right strings
+    char *left_tmp = strtok(left, " \t\n");
+    while (left_tmp != NULL){
+        left_parse[left_idx] = left_tmp;
+        left_idx++;
+        left_tmp = strtok(NULL, " \t\n");
+    }
+    left_parse[left_idx] = NULL;
+
+    char *right_tmp = strtok(right, " \t\n");
+    while (right_tmp != NULL){
+        right_parse[right_idx] = right_tmp;
+        right_idx++;
+        right_tmp = strtok(NULL, " \t\n");
+    }
+    right_parse[right_idx] = NULL;
+
+    //handle error cases
+    //if the file already exists
+    if (access(right_parse[0], F_OK) != -1){
+        throwError();
+        return;
+    }
+    //if there is no output file specified
+    if (right_parse[0] == NULL){
+        throwError();
+        return;
+    }
+
+
+    //if the command is cd, pwd, or exit
+    if (!strcmp(left_parse[0], "pwd") || !strcmp(left_parse[0], "exit") || !strcmp(left_parse[0], "cd")){
+        throwError();
+        return;
+    }
+
+    //now redirect
+    int fil = open(right_parse[0], O_RDWR | O_CREAT, S_IRUSR | S_IWUSR, 0664);
+    if (fil < 0){
+        throwError();
+        return;
+    }
+
+   if (fork() == 0){
+
+
+       dup2(fil, 1);
+
+       close(fil);
+
+       if (execvp(left_parse[0], left_parse) < 0){
+            throwError();
+       }
+       
+   }
+   else {
+       while (wait(NULL) > 0) {}
+   }
+    }
+
+
+void adv_red(char **right_parse, char **left_parse){
+    pid_t child1;
+    child1 = fork();
+
+    int ptr1;
+
+    char *filename = strdup(right_parse[0]);
+    strcat(filename, "tmp");
+
+    //make newfile with similar name done
+    //load stuff into this done
+    //cat file to newfile
+    //delete file
+    //rename to newfile to file
+
+    //make newfile with similar name, sends content to filename
+    ptr1 = open(filename, O_RDWR | O_CREAT, S_IRUSR | S_IWUSR, 0664);
+    if (ptr1 < 0){
+        throwError();
+        return;
+    }
+    if (child1 == 0){
+
+        dup2(ptr1, 1);
+
+        execvp(left_parse[0], left_parse);
+        exit(0);
+    }
+    else if (child1 > 0){
+
+        int status;
+        waitpid(child1, &status, 0);
+
+        child1 = fork();
+        if ((child1 = fork()) == 0){
+
+                dup2(ptr1, 1);
+
+                close(ptr1);
+
+                char *argvv[] = {"cat", right_parse[0]};
+
+                execvp(argvv[0], argvv);
+                exit(0);
+
+            }
+
+        else if (child1 > 0){
+            int status;
+            waitpid(child1, &status, 0);
+        }
+    }
+    else {
+        throwError();
+    }
+
+    //delete file and rename the new one
+    //remove(right_parse[0]);
+
+    //rename(filename, right_parse[0]);
+}
+
+
+
+
+void adv_redirect(char *args)
+{
+
+    
+    char *left_parse[512];
+    char *right_parse[512];
+    int left_idx = 0;
+    int right_idx = 0;
+    //args is of the form "  something >    eiufveubn   "
+    //split into left and right
+    char *args2 = strdup(args);
+    char *left = strtok(args, ">");
+
+    char *right = strstr(args2, "+");
+    right++;
+
+    char *isthere = strstr(right, ">+");
+    if (isthere != NULL){
+        throwError();
+        return;
+    }
+
+    //parse left and right strings
+    char *left_tmp = strtok(left, " \t\n");
+    while (left_tmp != NULL){
+        left_parse[left_idx] = left_tmp;
+        left_idx++;
+        left_tmp = strtok(NULL, " \t\n");
+    }
+    left_parse[left_idx] = NULL;
+
+    char *right_tmp = strtok(right, " \t\n");
+    while (right_tmp != NULL){
+        right_parse[right_idx] = right_tmp;
+        right_idx++;
+        right_tmp = strtok(NULL, " \t\n");
+    }
+    right_parse[right_idx] = NULL;
+
+    //handle error cases
+    //if there is no output file specified
+    if (right_parse[0] == NULL){
+        throwError();
+        return;
+    }
+    //if the command is cd, pwd, or exit
+    if (!strcmp(left_parse[0], "pwd") || !strcmp(left_parse[0], "exit") || !strcmp(left_parse[0], "cd")){
+        throwError();
+        return;
+    }
+
+    //if the file already exists
+    if (access(right_parse[0], F_OK) != -1){
+        adv_red(right_parse, left_parse);
+        return;
+    }
+
+    //now redirect
+    int fil = open(right_parse[0], O_RDWR | O_CREAT, S_IRUSR | S_IWUSR);
+
+   if (fork() == 0){
+
+       dup2(fil, 1);
+
+       close(fil);
+
+       execvp(left_parse[0], left_parse);
+   }
+   else {
+       while (wait(NULL) > 0) {}
+   }
+}
+
+int main(int argc, char *argv[])
+{
+    //cmd_buff holds info from stdin or file
+    char cmd_buff[514];
+    char *pinput;
+    //args holds the info from cmd_buff, but parsed
+    char *args[512];
+    
+    //setting input to batch files or stdin
+    FILE *input = stdin;
+    
+    if (argc == 2){
+        char *file = argv[1];
+        input = fopen(file, "r");
+        
+        //error is input DNE
+        if (input == NULL){
+            throwError();
+            exit(0);
+        }
+    }
+    //error if there is more than 1 file argument when calling myshell
+    else if (argc > 2){
+        throwError();
+        exit(0);
+    }
+
+    while (1) {
+
+        //the main prompt
+        if (input == stdin){
+            myPrint("myshell> ");
+        }
+
+        //get the input from batch file or stdin
+        pinput = fgets(cmd_buff, 514, input);
+        
+        //check if input is valid
+        if (pinput == NULL) {
+            exit(0);
+        }
+        //handle if the input is EMPTY - continues to next while loop//
+        int length = strlen(cmd_buff);
+        if (length <= 1){
+            continue;
+        }
+
+        //check if all white, and if so throw error and do not print
+        int white = 0;
+        for (int p = 0; cmd_buff[p] != '\n'; p++){
+            if (!isspace((unsigned char) cmd_buff[p])){
+                white = 1;
+                break;
+            }
+        }
+        if (white == 0){
+            continue;
+        }
+        
+        //for all others, print the input line back out
+        myPrint(cmd_buff);
+
+        //error for more than 512 characters - checks if longer, prints whats in cmdbuff, then prints next chs//
+        int toolong = 0;
+        for (int w  = 0 ; w < 513 ; w++){
+            if (cmd_buff[w] == '\n'){
+                toolong = 1;
+            }
+        }
+        if (toolong == 0){
+            char single = fgetc(input);
+            while (single != '\n' && single != EOF){
+                PrintChar(single);
+                single = fgetc(input);
+            }
+            PrintChar('\n');
+            throwError();
+            continue;
+            }
+
+        //parse and execute//
+        int num_commands = 0;
+
+        char *tmp[512];
+        char *commands = strtok(pinput, ";");
+
+        while (commands != NULL){
+            tmp[num_commands] = commands;
+            num_commands++;
+            commands = strtok(NULL, ";");
+        }
+            //now I have array tmp, with the different commands ["cd k", "wefiubw  ", "  ls >  owcn "]
+
+        //checks if any of the commands have >+ or >
+        char red_indic_arr[num_commands];
+        for (int g = 0; g < num_commands; g++){
+            char *pos_greater_adv = strstr(tmp[g], ">+");
+            char *pos_greater = strstr(tmp[g], ">");
+            if (pos_greater_adv != NULL){
+                red_indic_arr[g] = '1';
+                adv_redirect(tmp[g]);
+            }
+            else if (pos_greater != NULL){
+                red_indic_arr[g] = '1';
+                redirect(tmp[g]);
+            }
+            else {
+                red_indic_arr[g] = '0';
+            }
+        }
+
+
+        for (int k = 0; k < num_commands; k++){
+            if (red_indic_arr[k] == '0'){
+
+                char *deep = tmp[k];
+                int arg_idx = 0;
+                char *tok = strtok(deep, " \t\n");
+                while (tok != NULL){
+                    args[arg_idx] = tok;
+                    arg_idx++;
+                    tok = strtok(NULL, " \t\n");
+                }
+                args[arg_idx] = NULL;
+
+                execute_singlecom(args, arg_idx);
+            }
+        }
+    }
+}

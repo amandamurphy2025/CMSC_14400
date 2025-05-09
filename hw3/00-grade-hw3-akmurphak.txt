@@ -1,0 +1,20 @@
+akmurphak hw3 grade: 41/43
+
+Graded files from svn revision 14
+
+--------------------------------------
+Question 1 points and comments: 21/23
+
+-1] 0x54E is a miss
+-1] 0xFFD is a miss
+
+Graded by:  Joshua  Ahn (jjahn)
+--------------------------------------
+
+Question 2 points and comments: 20/20
+
+Graded by:  Hanchen  Li (lihanc2002)
+--------------------------------------
+
+If you believe there is an error in how you were graded, you have a week,
+starting from when this grade was returned, to notify us via email.

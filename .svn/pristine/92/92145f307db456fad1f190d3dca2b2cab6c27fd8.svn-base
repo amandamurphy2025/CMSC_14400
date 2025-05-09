@@ -1,0 +1,24 @@
+akmurphak p2cache grade: 93.0/100 
+ 
+https://phoenixforge.cs.uchicago.edu/svn/akmurphak-cs144-aut-23/p2cache 
+Grading revision: 17 
+
+$ make
+gcc -g -Wall -Werror -std=c99 -O0 -c trans.c
+gcc -g -Wall -Werror -std=c99 -o test-trans test-trans.c cachelab.c trans.o
+gcc -g -Wall -Werror -std=c99 -O0 -o tracegen tracegen.c trans.o cachelab.c
+
+$ ./driver.py
+Testing transpose function
+Running ./test-trans -M 32 -N 32
+Running ./test-trans -M 32 -N 64
+Running ./test-trans -M 64 -N 64
+
+Cache Lab summary:
+                        Points   Max pts      Misses
+Trans perf 32x32          38.0        38         287
+Trans perf 32x64          38.0        38         679
+Trans perf 64x64          17.0        24        1795
+          Total points    93.0       100
+
+Final Grade: 93.0
